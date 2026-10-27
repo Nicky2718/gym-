@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tengo una invitación para ti</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg1: #0f0f14;
+      --bg2: #1f1b2e;
+      --accent: #ff4d2e;
+      --accent2: #ffb800;
+      --paper: #fffaf0;
+      --ink: #1d1d24;
+      --env: #d63a24;
+      --env-dark: #a8291a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      font-family: "Poppins", sans-serif;
+      background: radial-gradient(circle at 20% 20%, #2a2140 0%, var(--bg1) 60%), var(--bg1);
+      color: var(--paper);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: 16px;
+    }
+
+    .hidden { display: none !important; }
+
+    /* ---------- SOBRE ---------- */
+    .stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+      transition: opacity .6s ease, transform .6s ease;
+    }
+    .stage.fade { opacity: 0; transform: scale(.9); pointer-events: none; }
+
+    .envelope {
+      position: relative;
+      width: min(340px, 86vw);
+      aspect-ratio: 3 / 2;
+      background: var(--env-dark);
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 25px 50px rgba(0,0,0,.5);
+      animation: float 3s ease-in-out infinite;
+      perspective: 900px;
+    }
+    .envelope.open { animation: none; }
+
+    .letter-peek {
+      position: absolute;
+      left: 6%;
+      bottom: 6%;
+      width: 88%;
+      height: 88%;
+      background: var(--paper);
+      border-radius: 6px;
+      z-index: 1;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 14px;
+      color: var(--ink);
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 1px;
+      transition: transform .9s cubic-bezier(.2,.8,.2,1) .45s;
+    }
+    .envelope.open .letter-peek { transform: translateY(-62%); }
+
+    .pocket {
+      position: absolute;
+      inset: 0;
+      background: var(--env);
+      border-radius: 10px;
+      clip-path: polygon(0 0, 50% 56%, 100% 0, 100% 100%, 0 100%);
+      z-index: 2;
+    }
+
+    .flap {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 62%;
+      background: #e8492f;
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+      transform-origin: top center;
+      z-index: 3;
+      transition: transform .6s ease, z-index 0s linear .3s;
+    }
+    .envelope.open .flap { transform: rotateX(180deg); z-index: 0; }
+
+    .seal {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 58px;
+      height: 58px;
+      transform: translate(-50%, -30%);
+      background: var(--accent2);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 1.7rem;
+      z-index: 4;
+      box-shadow: 0 4px 10px rgba(0,0,0,.35);
+      transition: opacity .3s ease, transform .3s ease;
+    }
+    .envelope.open .seal { opacity: 0; transform: translate(-50%, -30%) scale(.4); }
+
+    .hint {
+      font-size: .95rem;
+      opacity: .75;
+      animation: pulse 1.6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(-1deg); }
+      50% { transform: translateY(-10px) rotate(1deg); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: .4; }
+      50% { opacity: 1; }
+    }
+
+    /* ---------- CARTA ---------- */
+    .card {
+      position: relative;
+      width: min(460px, 100%);
+      background: var(--paper);
+      color: var(--ink);
+      border-radius: 18px;
+      padding: 34px 28px 30px;
+      box-shadow: 0 30px 60px rgba(0,0,0,.55);
+      text-align: center;
+      animation: popIn .7s cubic-bezier(.2,.9,.3,1.3) both;
+      background-image:
+        repeating-linear-gradient(transparent 0 31px, rgba(29,29,36,.06) 31px 32px);
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 8px;
+      border-radius: 18px 18px 0 0;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: translateY(40px) scale(.85); }
+      to { opacity: 1; transform: none; }
+    }
+
+    .dumbbell { width: 90px; margin: 0 auto 6px; display: block; }
+
+    .card h1 {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: clamp(2.2rem, 8vw, 3rem);
+      line-height: 1;
+      letter-spacing: 1px;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .card p { font-size: .98rem; line-height: 1.6; margin-bottom: 14px; }
+
+    .details {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 18px 0 22px;
+    }
+    .detail {
+      background: #fff;
+      border: 2px dashed rgba(255,77,46,.35);
+      border-radius: 12px;
+      padding: 10px 6px;
+    }
+    .detail span { display: block; font-size: .72rem; text-transform: uppercase; opacity: .6; letter-spacing: .5px; }
+    .detail strong { font-size: .95rem; }
+
+    .routine {
+      text-align: left;
+      background: #fff;
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 24px;
+      font-size: .9rem;
+      border-left: 4px solid var(--accent2);
+    }
+    .routine b { display: block; margin-bottom: 4px; }
+
+    .question {
+      font-weight: 700;
+      font-size: 1.15rem;
+      margin-bottom: 16px;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      min-height: 64px;
+    }
+
+    .btn {
+      font-family: "Poppins", sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      border: none;
+      border-radius: 999px;
+      padding: 14px 30px;
+      cursor: pointer;
+      transition: transform .2s ease, box-shadow .2s ease;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #yes {
+      background: linear-gradient(135deg, var(--accent), #ff7a2e);
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(255,77,46,.45);
+    }
+    #yes:hover { box-shadow: 0 12px 26px rgba(255,77,46,.6); }
+
+    #no {
+      background: #e6e3dc;
+      color: var(--ink);
+      transition: left .25s ease, top .25s ease, transform .2s ease;
+      white-space: nowrap;
+    }
+    #no.escaping {
+      position: fixed;
+      z-index: 50;
+    }
+
+    .taunt {
+      min-height: 22px;
+      margin-top: 14px;
+      font-size: .88rem;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* ---------- ÉXITO ---------- */
+    .success h1 { color: #1aa35a; }
+    .success .big { font-size: 3.5rem; margin-bottom: 6px; }
+    .checklist {
+      text-align: left;
+      display: inline-block;
+      margin: 8px 0 18px;
+      font-size: .95rem;
+      line-height: 1.9;
+    }
+
+    canvas#confetti {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sobre -->
+  <div class="stage" id="stage">
+    <div class="envelope" id="envelope" role="button" aria-label="Abrir invitación" tabindex="0">
+      <div class="letter-peek">Para ti</div>
+      <div class="pocket"></div>
+      <div class="flap"></div>
+      <div class="seal">💪</div>
+    </div>
+    <p class="hint">Toca el sobre para abrirlo</p>
+  </div>
+
+  <!-- Carta -->
+  <main class="card hidden" id="card">
+    <svg class="dumbbell" viewBox="0 0 120 40" aria-hidden="true">
+      <rect x="2" y="8" width="10" height="24" rx="3" fill="#1d1d24"/>
+      <rect x="14" y="2" width="12" height="36" rx="3" fill="#ff4d2e"/>
+      <rect x="26" y="16" width="68" height="8" rx="4" fill="#1d1d24"/>
+      <rect x="94" y="2" width="12" height="36" rx="3" fill="#ff4d2e"/>
+      <rect x="108" y="8" width="10" height="24" rx="3" fill="#1d1d24"/>
+    </svg>
+
+    <h1 id="title">¿Vamos al gym juntos?</h1>
+
+    <p id="intro"></p>
+
+    <div class="details">
+      <div class="detail"><span>Cuándo</span><strong id="d-dia"></strong></div>
+      <div class="detail"><span>Hora</span><strong id="d-hora"></strong></div>
+      <div class="detail"><span>Dónde</span><strong id="d-lugar"></strong></div>
+    </div>
+
+    <div class="routine">
+      <b>Plan del día</b>
+      <span id="d-rutina"></span>
+    </div>
+
+    <p class="question">Entonces... ¿aceptas?</p>
+
+    <div class="buttons">
+      <button class="btn" id="yes">Sí, vamos</button>
+      <button class="btn" id="no">No</button>
+    </div>
+    <p class="taunt" id="taunt"></p>
+  </main>
+
+  <!-- Respuesta positiva -->
+  <main class="card success hidden" id="success">
+    <div class="big">🏋️</div>
+    <h1>¡Eso es actitud!</h1>
+    <p id="success-msg"></p>
+    <div class="checklist">
+      ✔ Botella de agua<br>
+      ✔ Toalla<br>
+      ✔ Ropa cómoda y zapatos deportivos<br>
+      ✔ Cero excusas
+    </div>
+    <p><strong>Nada de cancelar a última hora, ¿eh?</strong></p>
+  </main>
+
+  <canvas id="confetti"></canvas>
+
+  <script>
+    // =============================================
+    // EDITA AQUÍ TUS DATOS
+    // =============================================
+    const CONFIG = {
+      nombre: "",                       // ej: "Andrea" (déjalo vacío si no quieres nombre)
+      dia: "Mañana",
+      hora: "6:00 pm",
+      lugar: "El gym de siempre",
+      rutina: "Calentamiento, día de pierna (sí, pierna), un poco de cardio y batido al final.",
+      mensajeExito: "Te espero a la hora acordada. Si llegas tarde, te toca hacer las sentadillas extra."
+    };
+    // =============================================
+
+    const $ = (id) => document.getElementById(id);
+
+    // Rellenar contenido
+    const saludo = CONFIG.nombre ? `${CONFIG.nombre}, ` : "";
+    $("intro").textContent =
+      `${saludo}tengo un plan mejor que quedarse en el sofá: entrenar juntos. ` +
+      `Prometo música buena, motivación gratis y no juzgarte si sufres en la última serie.`;
+    $("d-dia").textContent = CONFIG.dia;
+    $("d-hora").textContent = CONFIG.hora;
+    $("d-lugar").textContent = CONFIG.lugar;
+    $("d-rutina").textContent = CONFIG.rutina;
+    $("success-msg").textContent = CONFIG.mensajeExito;
+    if (CONFIG.nombre) $("title").textContent = `${CONFIG.nombre}, ¿vamos al gym?`;
+
+    // ---------- Abrir el sobre ----------
+    const envelope = $("envelope");
+    let opened = false;
+
+    function openEnvelope() {
+      if (opened) return;
+      opened = true;
+      envelope.classList.add("open");
+      setTimeout(() => $("stage").classList.add("fade"), 1500);
+      setTimeout(() => {
+        $("stage").classList.add("hidden");
+        $("card").classList.remove("hidden");
+      }, 2100);
+    }
+    envelope.addEventListener("click", openEnvelope);
+    envelope.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") openEnvelope();
+    });
+
+    // ---------- Botón NO que se escapa ----------
+    const noBtn = $("no");
+    const yesBtn = $("yes");
+    const taunt = $("taunt");
+    let escapes = 0;
+
+    const frases = [
+      "¿Seguro? Piénsalo bien.",
+      "Ese botón no funciona, prueba el otro.",
+      "El sofá no cuenta como cardio.",
+      "Casi... pero no.",
+      "Tus músculos dicen que sí.",
+      "Ni lo intentes 😏",
+      "La excusa de hoy no aplica.",
+      "Solo queda una opción, ¿no crees?"
+    ];
+    const textosNo = ["No", "¿Seguro?", "Nop", "Jamás", "Mmm...", "No... ¿o sí?", "Atrápame"];
+
+    function overlaps(x, y, w, h, rect, margin = 20) {
+      return !(x + w + margin < rect.left || x - margin > rect.right ||
+               y + h + margin < rect.top || y - margin > rect.bottom);
+    }
+
+    function escapeNo(e) {
+      if (e) e.preventDefault();
+
+      const r = noBtn.getBoundingClientRect();
+
+      // Primera vez: lo sacamos de la carta y lo fijamos donde estaba
+      if (!noBtn.classList.contains("escaping")) {
+        const placeholder = document.createElement("span");
+        placeholder.style.width = r.width + "px";
+        placeholder.style.height = r.height + "px";
+        placeholder.style.display = "inline-block";
+        noBtn.parentNode.insertBefore(placeholder, noBtn);
+
+        document.body.appendChild(noBtn);
+        noBtn.classList.add("escaping");
+        noBtn.style.left = r.left + "px";
+        noBtn.style.top = r.top + "px";
+        noBtn.offsetHeight; // forzar reflow para que anime
+      }
+
+      const pad = 16;
+      const w = noBtn.offsetWidth;
+      const h = noBtn.offsetHeight;
+      const maxX = Math.max(pad, window.innerWidth - w - pad);
+      const maxY = Math.max(pad, window.innerHeight - h - pad);
+      const yesRect = yesBtn.getBoundingClientRect();
+
+      let x, y, tries = 0;
+      do {
+        x = pad + Math.random() * (maxX - pad);
+        y = pad + Math.random() * (maxY - pad);
+        tries++;
+      } while (
+        tries < 40 &&
+        (Math.hypot(x - r.left, y - r.top) < 160 || overlaps(x, y, w, h, yesRect))
+      );
+
+      noBtn.style.left = x + "px";
+      noBtn.style.top = y + "px";
+
+      escapes++;
+      taunt.textContent = frases[escapes % frases.length];
+      noBtn.textContent = textosNo[escapes % textosNo.length];
+
+      // El botón SÍ crece un poquito cada vez (con límite)
+      const scale = Math.min(1 + escapes * 0.08, 1.6);
+      yesBtn.style.transform = `scale(${scale})`;
+    }
+
+    noBtn.addEventListener("mouseenter", escapeNo);
+    noBtn.addEventListener("touchstart", escapeNo, { passive: false });
+    noBtn.addEventListener("click", escapeNo);   // por si llega con teclado
+    noBtn.addEventListener("focus", () => noBtn.blur());
+
+    window.addEventListener("resize", () => {
+      if (!noBtn.classList.contains("escaping")) return;
+      const maxX = window.innerWidth - noBtn.offsetWidth - 16;
+      const maxY = window.innerHeight - noBtn.offsetHeight - 16;
+      noBtn.style.left = Math.min(parseFloat(noBtn.style.left), maxX) + "px";
+      noBtn.style.top = Math.min(parseFloat(noBtn.style.top), maxY) + "px";
+    });
+
+    // ---------- Botón SÍ ----------
+    yesBtn.addEventListener("click", () => {
+      $("card").classList.add("hidden");
+      noBtn.classList.add("hidden");
+      $("success").classList.remove("hidden");
+      launchConfetti();
+    });
+
+    // ---------- Confeti ----------
+    function launchConfetti() {
+      const canvas = $("confetti");
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const colors = ["#ff4d2e", "#ffb800", "#1aa35a", "#3a86ff", "#ffffff"];
+      const pieces = Array.from({ length: 180 }, () => ({
+        x: Math.random() * canvas.width,
+        y: -20 - Math.random() * canvas.height * 0.5,
+        w: 6 + Math.random() * 6,
+        h: 8 + Math.random() * 8,
+        vy: 2 + Math.random() * 4,
+        vx: -2 + Math.random() * 4,
+        rot: Math.random() * Math.PI,
+        vr: -0.2 + Math.random() * 0.4,
+        color: colors[Math.floor(Math.random() * colors.length)]
+      }));
+
+      let frame = 0;
+      (function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pieces.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.rot += p.vr;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+          ctx.restore();
+        });
+        frame++;
+        if (frame < 320) requestAnimationFrame(draw);
+        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+      })();
+    }
+  </script>
+</body>
+</html>
